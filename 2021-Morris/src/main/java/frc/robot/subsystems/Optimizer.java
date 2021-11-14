@@ -14,23 +14,24 @@ public class Optimizer extends SubsystemBase {
   public Optimizer() {}
 
   public void changeAngle(double wantAngle){
-    diffAngle = wantAngle - initAngle;
+    diffAngle = Math.abs(wantAngle - initAngle);
 
     double setAngle = wantAngle;
 
-    if(diffAngle < 0){
-      diffAngle += 360;
-    }
 
     if(diffAngle <= 180){
       setAngle = wantAngle;
+      drive.setLeftForwardMotorEncoder(setAngle);
     } 
-    else{
-      setAngle = 360 - wantAngle;
+    else if(((wantAngle - 180) - initAngle) < diffAngle) { 
+      setAngle = wantAngle + 180;
+      drive.flipMotors();
+      drive.setLeftForwardMotorEncoder(setAngle);
     }
 
-    if(((wantAngle + 180) - initAngle) < setAngle) { 
-      setAngle = wantAngle + 180;
+    else{
+      setAngle = wantAngle - 360;
+      drive.setForwardBackMotors(setAngle);
     }
 
 
