@@ -107,6 +107,11 @@ public class Drive extends SubsystemBase {
         return backRightAbsoluteEncoder.getAbsolutePosition();
     }
 
+    public void setLeftForwardMotorEncoder(double angle){
+        leftForwardMotor.setSelectedSensorPosition(angle);
+    }
+
+
     public void postMotorEncoders() {
         SmartDashboard.putNumber("LeftForwardMotor", getLeftForwardEncoder());
     }
