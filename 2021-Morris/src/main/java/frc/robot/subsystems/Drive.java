@@ -11,10 +11,14 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.OI;
 import frc.robot.commands.defaults.DriveDefault;
 
 public class Drive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
+
+    private final OI OI = new OI();
+
     private final WPI_TalonFX leftForwardMotor = new WPI_TalonFX(6);
     private final WPI_TalonFX leftForwardAngleMotor = new WPI_TalonFX(1);
     private final WPI_TalonFX leftBackMotor = new WPI_TalonFX(4);
@@ -34,10 +38,10 @@ public class Drive extends SubsystemBase {
     private CANCoder frontRightAbsoluteEncoder = new CANCoder(5);
     private CANCoder backLeftAbsoluteEncoder = new CANCoder(3);
 
-    private final SwerveModule leftFront = new SwerveModule(1, leftForwardAngleMotor, leftForwardMotor, 0, frontLeftAbsoluteEncoder);
-    private final SwerveModule leftBack = new SwerveModule(2, leftBackAngleMotor, leftBackMotor, 0, backLeftAbsoluteEncoder);
+    private final SwerveModule leftFront = new SwerveModule(2, leftForwardAngleMotor, leftForwardMotor, 0, frontLeftAbsoluteEncoder);
+    private final SwerveModule leftBack = new SwerveModule(3, leftBackAngleMotor, leftBackMotor, 0, backLeftAbsoluteEncoder);
     private final SwerveModule rightFront = new SwerveModule(1, rightForwardAngleMotor, rightForwardMotor, 0, frontRightAbsoluteEncoder);
-    private final SwerveModule rightBack = new SwerveModule(2, rightBackAngleMotor, rightBackMotor, 0, backRightAbsoluteEncoder);
+    private final SwerveModule rightBack = new SwerveModule(4, rightBackAngleMotor, rightBackMotor, 0, backRightAbsoluteEncoder);
 
     private double kF = 0;
     private double kP = 0.01;
@@ -56,10 +60,10 @@ public class Drive extends SubsystemBase {
     public void setAnglePid(double targetAngle, double navxOffset, double percent) {
         // targetAngle = targetAngle + 90 + navxOffset;
         SmartDashboard.putNumber("Target", targetAngle);
-        leftFront.setAnglePID(targetAngle);
-        leftBack.setAnglePID(targetAngle);
-        rightFront.setAnglePID(targetAngle);
-        rightBack.setAnglePID(targetAngle);
+        // leftFront.setAnglePID(targetAngle);
+        // leftBack.setAnglePID(targetAngle);
+        // rightFront.setAnglePID(targetAngle);
+        // rightBack.setAnglePID(targetAngle);
         setForwardBackMotors(percent);
     }
 
@@ -82,13 +86,7 @@ public class Drive extends SubsystemBase {
         leftBack.setDriveMotors(-percent);
     }
 
-    public double getJoystickAngle(double joystickUp, double joystickSide) {
-        if(Math.abs(joystickUp) < 0.05 && Math.abs(joystickSide) < 0.005) {
-            return 0.0;
-        }
-        double joystickAngle = Math.atan2(-joystickUp, joystickSide);
-        return joystickAngle;
-    }
+    
 
     public double getLeftForwardEncoder() {
         // frontLeftAbsoluteEncoder.setPosition(50);
@@ -204,6 +202,14 @@ public class Drive extends SubsystemBase {
         rightBack.init();
         rightFront.init();
         peripherals.zeroNavx();
+    }
+
+    public void swerveDrive() {
+        leftFront.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
+        rightFront.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
+        leftBack.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
+        rightBack.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
+
     }
 
     private Command DriveDefault() {

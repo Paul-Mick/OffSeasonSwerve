@@ -32,29 +32,10 @@ public class DriveDefault extends CommandBase {
   public void execute() {
     // drive.getAngleMotorAngle(0);
     // drive.postAbsoluteEncoder();
-    SmartDashboard.putNumber("Controller Angle", drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()));
-    SmartDashboard.putNumber("Left Front Abs Encoder", drive.getLeftForwardEncoder());
-    if(OI.driverController.getAButton()) {
-        // drive.setAngleMotors(0.2);
-      drive.driveOptimizer(90, 0);
-    }
-    else if(OI.driverController.getBButton()) {
-        // drive.setForwardBackMotors((0.2));
-      drive.driveOptimizer(181, 0);
-    }
-    else if(OI.driverController.getYButton()) {
-      drive.driveOptimizer(270, 0);
-    }
-    else if(OI.driverController.getXButton()) { 
-      drive.driveOptimizer(1, 0);
-    }
-    else if(OI.getDriverLeftY() != 0 && OI.getDriverLeftX() != 0){
-      drive.driveOptimizer(drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()), drive.getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()));
- 
-    }
-    else {
-    //  drive.setDriveMotorPercents(0);
-    }
+    // SmartDashboard.putNumber("Controller Angle", drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()));
+    // SmartDashboard.putNumber("Left Front Abs Encoder", drive.getLeftForwardEncoder());
+    drive.swerveDrive();
+    
   }
 
   // Called once the command ends or is interrupted.
