@@ -63,6 +63,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     drive.postMotorEncoders();
     drive.postAngleMotorValues();
+    drive.postIntegratedAngleValues();
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled

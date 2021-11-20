@@ -6,10 +6,12 @@ import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Peripherals;
 
 public class DriveDefault extends CommandBase {
   /** Creates a new DriveDefault. */
   private static Drive drive;
+  private final Peripherals peripherals = new Peripherals();
   
 
   public DriveDefault(Drive drive) {
@@ -34,21 +36,24 @@ public class DriveDefault extends CommandBase {
     SmartDashboard.putNumber("Left Front Abs Encoder", drive.getLeftForwardEncoder());
     if(OI.driverController.getAButton()) {
         // drive.setAngleMotors(0.2);
-      drive.setAnglePid(90, 0);
+      drive.driveOptimizer(90, 0);
     }
     else if(OI.driverController.getBButton()) {
         // drive.setForwardBackMotors((0.2));
-      drive.setAnglePid(180, 0);
+      drive.driveOptimizer(181, 0);
     }
     else if(OI.driverController.getYButton()) {
-      drive.setAnglePid(270, 0);
+      drive.driveOptimizer(270, 0);
+    }
+    else if(OI.driverController.getXButton()) { 
+      drive.driveOptimizer(1, 0);
     }
     else if(OI.getDriverLeftY() != 0 && OI.getDriverLeftX() != 0){
-      drive.setAnglePid(drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()), 0);
-      drive.setForwardBackMotors(drive.getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()));
+      drive.driveOptimizer(drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()), drive.getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()));
+ 
     }
     else {
-      drive.setDriveMotorPercents(0);
+    //  drive.setDriveMotorPercents(0);
     }
   }
 
