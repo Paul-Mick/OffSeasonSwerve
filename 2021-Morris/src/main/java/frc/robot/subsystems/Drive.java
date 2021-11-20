@@ -172,7 +172,7 @@ public class Drive extends SubsystemBase {
             joystickSide = 0;
         }
 
-        System.out.println("Adjusted Y: " + joystickUp);
+        // System.out.println("Adjusted Y: " + joystickUp);
 
 
         joystickUp = Math.abs(joystickUp);
@@ -206,6 +206,7 @@ public class Drive extends SubsystemBase {
 
     public void swerveDrive() {
         leftFront.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
+        System.out.println(leftFront.getModulePosition());
         rightFront.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
         leftBack.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
         rightBack.swerveModule(peripherals.getNavxAngle(), getDriveMotorPercent(OI.getDriverLeftY(), OI.getDriverLeftX()), OI.getDriverRightX());
@@ -216,87 +217,34 @@ public class Drive extends SubsystemBase {
         return null;
     }
 
-    private void rightNoFlip(double wantAngle, double percent){
-        double setAngle = wantAngle;
-        setAnglePid(setAngle, 0, percent);
-    }
-
-    private void leftNoFlip(double wantAngle, double percent){
-        double setAngle = wantAngle - degreesToRadians(360);
-        setAnglePid(setAngle, 0 , percent);
-    }
-
-    private void rightAndFlip(double wantAngle, double percent){
-        double setAngle = wantAngle + 180;
-        setAnglePid(setAngle, 0 , -percent);
-    }
-
-    private void leftAndFlip(double wantAngle, double percent){
-        double setAngle = (wantAngle + 180) - degreesToRadians(360);
-        setAnglePid(setAngle, 0 , -percent);
-    }
-
-    public void driveOptimizer(double wantAngle, double percent){
+    public void driveOptimizer(double wantAngle, double motorPercent){
         initAngle = ticsToRadians(leftFront.getAngleMotorEncoder());
         diffAngle = Math.abs(wantAngle - initAngle);
         double anglePos = radiansToDegrees(ticsToRadians(leftForwardAngleMotor.getSelectedSensorPosition()));   
 
-        System.out.println("Position: " + anglePos);
+        // System.out.println("Position: " + anglePos);
         double caseOneAngle = wantAngle;
-        double caseTwoAngle = wantAngle - degreesToRadians(360);
-        double caseThreeAngle = wantAngle + 180;
-        double caseFourAngle = (wantAngle + 180) - degreesToRadians(360);
+        double caseTwoAngle = wantAngle - Math.toRadians(360);
+        double caseThreeAngle = wantAngle + Math.toRadians(180);
+        double caseFourAngle = (wantAngle + Math.toRadians(180)) - Math.toRadians(360);
 
-        double distanceOne = Math.abs(90-caseOneAngle);
-        double distanceTwo = Math.abs(90-caseTwoAngle);
-        double distanceThree = Math.abs(90-caseThreeAngle);
-        double distanceFour = Math.abs(90-caseFourAngle);
+        double distanceOne = Math.abs(initAngle - caseOneAngle);
+        double distanceTwo = Math.abs(initAngle - caseTwoAngle);
+        double distanceThree = Math.abs(initAngle - caseThreeAngle);
+        double distanceFour = Math.abs(initAngle - caseFourAngle);
 
         if((distanceOne < distanceTwo) && (distanceOne < distanceThree) && (distanceOne < distanceFour)){
-            setAnglePid(caseOneAngle, 0 , percent);
+            setAnglePid(caseOneAngle, 0 , motorPercent);
         }
         if((distanceTwo < distanceOne) && (distanceTwo < distanceThree) && (distanceTwo < distanceFour)){
-            setAnglePid(caseTwoAngle, 0 , percent);
+            setAnglePid(caseTwoAngle, 0 , motorPercent);
         }
         if((distanceThree < distanceOne) && (distanceThree < distanceTwo) && (distanceThree < distanceFour)){
-            setAnglePid(caseThreeAngle, 0 , -percent);
+            setAnglePid(caseThreeAngle, 0 , -motorPercent);
         }
         if((distanceFour < distanceOne) && (distanceFour < distanceTwo) && (distanceFour < distanceThree)){
-            setAnglePid(caseFourAngle, 0 , -percent);
+            setAnglePid(caseFourAngle, 0 , -motorPercent);
         }
-
-
-
-        // if(diffAngle > (degreesToRadians(90)) && (wantAngle > initAngle)){
-        //     setAngle = wantAngle + degreesToRadians(180);
-        //     setAnglePid(setAngle, 0 , -percent);
-        //     SmartDashboard.putBoolean("Case 1", true);
-        //     SmartDashboard.putBoolean("Case 4", false);
-        //     SmartDashboard.putBoolean("Case 2", false);
-        //     SmartDashboard.putBoolean("Case 3", false);
-        //   }
-        //   else if(diffAngle > degreesToRadians(90) && (wantAngle < initAngle)){
-        //     setAngle = wantAngle + degreesToRadians(180);
-        //     setAnglePid(setAngle, 0, -percent);
-        //     SmartDashboard.putBoolean("Case 2", true);
-        //     SmartDashboard.putBoolean("Case 1", false);
-        //     SmartDashboard.putBoolean("Case 3", false);
-        //     SmartDashboard.putBoolean("Case 4", false);
-        //   }
-        //   else if(diffAngle < degreesToRadians(90) && (wantAngle < initAngle)){
-        //     setAnglePid(wantAngle, 0, percent);
-        //     SmartDashboard.putBoolean("Case 3", true);
-        //     SmartDashboard.putBoolean("Case 2", false);
-        //     SmartDashboard.putBoolean("Case 1", false);
-        //     SmartDashboard.putBoolean("Case 4", false);
-        //   }
-        //   else if(diffAngle < degreesToRadians(90) && (wantAngle > initAngle)){
-        //     setAnglePid(wantAngle, 0, percent);
-        //     SmartDashboard.putBoolean("Case 4", true);
-        //     SmartDashboard.putBoolean("Case 1", false);
-        //     SmartDashboard.putBoolean("Case 3", false);
-        //     SmartDashboard.putBoolean("Case 2", false);
-        //   }
       }
    
    

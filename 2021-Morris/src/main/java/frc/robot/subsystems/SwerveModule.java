@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
@@ -116,10 +117,16 @@ public class SwerveModule extends SubsystemBase {
 
     public void init() {
         angleMotor.setSelectedSensorPosition(radiansToTics(degreesToRadians(absoluteEncoder.getAbsolutePosition())));
+        angleMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 0 ,0));
+        driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 0 , 0));
     }
 
     public double getAngleMotorEncoder(){
         return angleMotor.getSelectedSensorPosition();
+    }
+
+    public double getModulePosition(){
+        return ticsToRadians(getAngleMotorEncoder());
     }
 
     public void vectorCalculations(double targetX, double targetY, double navxOffset, double turnPercent) {
@@ -137,7 +144,7 @@ public class SwerveModule extends SubsystemBase {
         double turnX = turnPercent * turnVectorX;
         double turnY = turnPercent * turnVectorY;
 
-        System.out.println("Adj X: " + turnX + " Adj Y : " + turnY);
+        // System.out.println("Adj X: " + turnX + " Adj Y : " + turnY);
 
 
         double adjustedVectorX = turnX + navxAdjustedX;
@@ -146,13 +153,58 @@ public class SwerveModule extends SubsystemBase {
         double motorPercent = Math.sqrt(Math.pow(adjustedVectorX, 2) + Math.pow(adjustedVectorY, 2));
         double adjustedAngle = Math.atan2(adjustedVectorY, adjustedVectorX);
 
-        setAnglePID(adjustedAngle, motorPercent);
+        double initAngle = getModulePosition();
+        double boundedInitAngle = initAngle%Math.toRadians(360);
+        // if(boundedInitAngle < 0){
+        //     boundedInitAngle += Math.toRadians(360);
+        // }
+
+        double caseOneAngle = adjustedAngle;
+        if(adjustedAngle > boundedInitAngle){
+            caseOneAngle = adjustedAngle - Math.toRadians(360);
+        }
+        //Case one moves clockwise
+        double caseTwoAngle = adjustedAngle;
+        if(adjustedAngle < boundedInitAngle){
+         caseTwoAngle = adjustedAngle + Math.toRadians(360);
+
+        }
+        //Case two moves counterclockwise
+        double caseThreeAngle = adjustedAngle + Math.toRadians(180);
+        double caseFourAngle = (adjustedAngle + Math.toRadians(180)) - Math.toRadians(360);
+
+        double distanceOne = Math.abs(boundedInitAngle - caseOneAngle);
+        double distanceTwo = Math.abs(boundedInitAngle - caseTwoAngle);
+        double distanceThree = Math.abs(boundedInitAngle - caseThreeAngle);
+        double distanceFour = Math.abs(boundedInitAngle - caseFourAngle);
+
+        if(motorPercent > 0.1){
+
+            if((distanceOne < distanceTwo) && (distanceOne < distanceThree) && (distanceOne < distanceFour)){
+                setAnglePID((caseOneAngle - boundedInitAngle + initAngle), motorPercent);
+            }
+            if((distanceTwo < distanceOne) && (distanceTwo < distanceThree) && (distanceTwo < distanceFour)){
+                setAnglePID((caseTwoAngle - boundedInitAngle + initAngle), motorPercent);
+            }
+            if((distanceThree < distanceOne) && (distanceThree < distanceTwo) && (distanceThree < distanceFour)){
+                setAnglePID((caseThreeAngle - boundedInitAngle + initAngle),  -motorPercent);
+            }
+            if((distanceFour < distanceOne) && (distanceFour < distanceTwo) && (distanceFour < distanceThree)){
+                setAnglePID((caseFourAngle - boundedInitAngle + initAngle),  -motorPercent);
+            }
+        } 
+        else{
+            driveMotor.set(ControlMode.PercentOutput, 0);
+        }
+
+       
+       // setAnglePID(adjustedAngle, motorPercent);
     }
 
     public void swerveModule(double navxOffset, double driveMotorPercent, double turnPercent) {
         // System.out.println("NAVX: " + navxOffset);
         // System.out.println("Turn: " + OI.getDriverRightX())
-        System.out.println("Turn Percent: " + turnPercent);
+        // System.out.println("Turn Percent: " + turnPercent);
         if(OI.driverController.getAButton()) {
             // drive.setAngleMotors(0.2);
             // driveOptimizer(90, 0);
