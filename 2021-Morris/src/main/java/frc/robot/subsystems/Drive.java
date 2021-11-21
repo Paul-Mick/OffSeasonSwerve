@@ -12,6 +12,7 @@ import frc.robot.commands.defaults.DriveDefault;
 public class Drive extends SubsystemBase {
     private final OI OI = new OI();
 
+    // creating all the falcons
     private final WPI_TalonFX leftForwardMotor = new WPI_TalonFX(6);
     private final WPI_TalonFX leftForwardAngleMotor = new WPI_TalonFX(1);
     private final WPI_TalonFX leftBackMotor = new WPI_TalonFX(4);
@@ -26,11 +27,13 @@ public class Drive extends SubsystemBase {
     private double adjustedX = 0.0;
     private double adjustedY = 0.0;
 
+    // creating all the external encoders
     private CANCoder backRightAbsoluteEncoder = new CANCoder(2);
     private CANCoder frontLeftAbsoluteEncoder = new CANCoder(1);
     private CANCoder frontRightAbsoluteEncoder = new CANCoder(5);
     private CANCoder backLeftAbsoluteEncoder = new CANCoder(3);
 
+    // creating each swerve module with angle and drive motor, module number(relation to robot), and external encoder
     private final SwerveModule leftFront = new SwerveModule(2, leftForwardAngleMotor, leftForwardMotor, 0, frontLeftAbsoluteEncoder);
     private final SwerveModule leftBack = new SwerveModule(3, leftBackAngleMotor, leftBackMotor, 0, backLeftAbsoluteEncoder);
     private final SwerveModule rightFront = new SwerveModule(1, rightForwardAngleMotor, rightForwardMotor, 0, frontRightAbsoluteEncoder);
@@ -44,6 +47,7 @@ public class Drive extends SubsystemBase {
         this.peripherals = peripherals;
     }
 
+    // get each external encoder
     public double getLeftForwardEncoder() {
         return leftFront.getAbsolutePosition();
     }
@@ -60,16 +64,19 @@ public class Drive extends SubsystemBase {
         return rightBack.getAbsolutePosition();
     }
 
+    // get Joystick adjusted y-value
     public double getAdjustedY(double originalX, double originalY){
         double adjustedY = originalY * Math.sqrt((1-(Math.pow(originalX, 2))/2));
         return adjustedY;
     }
 
+    // get Joystick adjusted x-value
     public double getAdjustedX(double originalX, double originalY){
         double adjustedX = originalX * Math.sqrt((1-(Math.pow(originalY, 2))/2));
         return adjustedX;
     }
 
+    // method run on robot initialization
     public void init() {
         leftFront.init();
         leftBack.init();
@@ -80,6 +87,7 @@ public class Drive extends SubsystemBase {
         setDefaultCommand(new DriveDefault(this));
     }
 
+    // method to actually run swerve code
     public void swerveDrive() {
         double originalX = OI.getDriverLeftX();
         double originalY = -OI.getDriverLeftY();
@@ -92,14 +100,12 @@ public class Drive extends SubsystemBase {
         rightFront.moduleDrive( xPower, yPower, turn, navxOffset);
         leftBack.moduleDrive(xPower, yPower, turn, navxOffset);
         rightBack.moduleDrive(xPower, yPower, turn, navxOffset);
-
     }
 
     private Command DriveDefault() {
         return null;
     }
  
-
     @Override
     public void periodic() {
     }

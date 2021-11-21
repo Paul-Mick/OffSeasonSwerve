@@ -39,8 +39,6 @@ public class Peripherals extends SubsystemBase {
     return navx.currentRoll();
   }
 
-
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

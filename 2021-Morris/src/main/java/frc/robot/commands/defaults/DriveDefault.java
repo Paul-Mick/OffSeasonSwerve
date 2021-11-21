@@ -10,33 +10,23 @@ import frc.robot.subsystems.Peripherals;
 
 public class DriveDefault extends CommandBase {
   /** Creates a new DriveDefault. */
-  private static Drive drive;
-  // private final Peripherals peripherals = new Peripherals();
-  
+  private static Drive drive;  
 
   public DriveDefault(Drive drive) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
     addRequirements(drive);
-    // navx.softResetAngle();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // navx.softResetAngle();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
-    // drive.getAngleMotorAngle(0);
-    // drive.postAbsoluteEncoder();
-    // SmartDashboard.putNumber("Controller Angle", drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()));
-    // SmartDashboard.putNumber("Left Front Abs Encoder", drive.getLeftForwardEncoder());
     drive.swerveDrive();
-    
   }
 
   // Called once the command ends or is interrupted.
