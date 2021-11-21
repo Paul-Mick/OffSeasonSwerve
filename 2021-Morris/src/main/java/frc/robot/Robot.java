@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   double startTime;
 
   private final Peripherals peripherals = new Peripherals();
-  private Drive drive = new Drive();
+  private Drive drive = new Drive(peripherals);
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -61,9 +61,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drive.postMotorEncoders();
-    drive.postAngleMotorValues();
-    drive.postIntegratedAngleValues();
+    // System.out.println("Encoder Position " +  );
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled

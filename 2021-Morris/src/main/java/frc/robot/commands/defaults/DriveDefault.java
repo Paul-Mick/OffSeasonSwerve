@@ -11,7 +11,7 @@ import frc.robot.subsystems.Peripherals;
 public class DriveDefault extends CommandBase {
   /** Creates a new DriveDefault. */
   private static Drive drive;
-  private final Peripherals peripherals = new Peripherals();
+  // private final Peripherals peripherals = new Peripherals();
   
 
   public DriveDefault(Drive drive) {
@@ -30,6 +30,7 @@ public class DriveDefault extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    
     // drive.getAngleMotorAngle(0);
     // drive.postAbsoluteEncoder();
     // SmartDashboard.putNumber("Controller Angle", drive.getJoystickAngle(OI.getDriverLeftY(), OI.getDriverLeftX()));
